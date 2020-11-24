@@ -1,0 +1,7 @@
+# Ignore CLion build files.
+cmake-*
+.idea/
+
+# Ignore executables.
+a.out
+*.stackdump
