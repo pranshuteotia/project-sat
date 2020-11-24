@@ -1,0 +1,3 @@
+D:/projecy-sat/cmake-build-debug/CMakeFiles/projecy_sat.dir
+D:/projecy-sat/cmake-build-debug/CMakeFiles/edit_cache.dir
+D:/projecy-sat/cmake-build-debug/CMakeFiles/rebuild_cache.dir
