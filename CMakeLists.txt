@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.16)
-project(projecy_sat)
+project(project_sat)
 
 set(CMAKE_CXX_STANDARD 14)
 
-add_executable(projecy_sat main.cpp)
+add_executable(project-sat src/main.cpp lib/BruteForceSolver.cpp lib/BruteForceSolver.h)

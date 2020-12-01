@@ -1,8 +1,9 @@
 #include <iostream>
 #include <vector>
 #include <sstream>
+#include "../lib/BruteForceSolver.h"
 
-std::pair<std::vector<std::vector<int>>, std::vector<int>> parse_file(const char *const filename) {
+std::pair<std::vector<std::vector<int>>, int> parse_file(const char *const filename) {
     std::vector<std::vector<int>> clauses;
     std::vector<int> variables;
     std::vector<std::string> problem;
@@ -54,12 +55,16 @@ std::pair<std::vector<std::vector<int>>, std::vector<int>> parse_file(const char
         }
     }
 
-    return std::make_pair(clauses, variables);
+    std::fclose(stdin);
+
+    return std::make_pair(clauses, num_variables);
 }
 
 int main() {
 
-    auto clauses = parse_file("data.in").first;
+    auto result = parse_file("data.in");
+    auto clauses = result.first;
+    int num_variables = result.second;
 
     for(auto clause : clauses) {
         for(auto literal : clause) {
@@ -68,6 +73,19 @@ int main() {
 
         std::cout << std::endl;
     }
+
+    BruteForceSolver solver(clauses, num_variables);
+    auto all_instances = solver.iter_solve();
+
+    auto sat = solver.solve();
+    for(auto sat : all_instances) {
+        for(auto v : sat) {
+            std::cout << v << " ";
+        }
+        std::cout << std::endl;
+    }
+
+    solver.output_to_file();
 
     return 0;
 }
