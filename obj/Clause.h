@@ -9,17 +9,9 @@
 #include <vector>
 
 struct Clause {
-    std::unordered_set<int> literals;
-
-    Clause() {
-
-    }
-
-    Clause(std::vector<int> _clause) {
-        for(int literal : _clause) {
-            literals.insert(literal);
-        }
-    }
+    std::unordered_set<int> _literals;
+    size_t _id;
+    int size() const { return _literals.size(); }
 };
 
 #endif //PROJECT_SAT_CLAUSE_H
