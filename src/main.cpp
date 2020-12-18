@@ -2,6 +2,7 @@
 #include <vector>
 #include <sstream>
 #include "../lib/BruteForceSolver.h"
+#include "../lib/DPLLSolver.h"
 
 std::pair<std::vector<std::vector<int>>, int> parse_file(const char *const filename) {
     std::vector<std::vector<int>> clauses;
@@ -20,7 +21,6 @@ std::pair<std::vector<std::vector<int>>, int> parse_file(const char *const filen
         // It's a comment. Should be ignored.
         if(first_char == 'c') {
             continue;
-
         }
         // Is a problem statement. Extract the number of variables and clauses.
         else if(first_char == 'p') {
@@ -66,7 +66,7 @@ int main() {
     auto clauses = result.first;
     int num_variables = result.second;
 
-    for(auto clause : clauses) {
+    for(const auto &clause : clauses) {
         for(auto literal : clause) {
             std::cout << literal << ' ';
         }
@@ -78,14 +78,20 @@ int main() {
     auto all_instances = solver.iter_solve();
 
     auto sat = solver.solve();
-    for(auto sat : all_instances) {
+    /*for(const auto &sat : all_instances) {
         for(auto v : sat) {
             std::cout << v << " ";
         }
         std::cout << std::endl;
-    }
+    }*/
 
     solver.output_to_file();
 
+    DPLLSolver solver2(clauses, num_variables);
+    auto temp = solver2.pq.top();
+
+    for(auto e : temp) {
+        std::cout << e << "-";
+    }
     return 0;
 }
