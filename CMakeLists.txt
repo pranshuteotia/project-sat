@@ -3,4 +3,4 @@ project(project_sat)
 
 set(CMAKE_CXX_STANDARD 14)
 
-add_executable(project-sat src/main.cpp lib/BruteForceSolver.cpp lib/BruteForceSolver.h lib/DPLLSolver.cpp lib/DPLLSolver.h obj/Clause.h)
+add_executable(project-sat src/main.cpp lib/BruteForceSolver.cpp lib/BruteForceSolver.h lib/DPLLSolver.cpp lib/DPLLSolver.h obj/Clause.h src/main.cpp)

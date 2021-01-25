@@ -22,7 +22,7 @@ std::pair<std::vector<std::vector<int>>, int> parse_file(const char *const filen
         if(first_char == 'c') {
             continue;
         }
-        // Is a problem statement. Extract the number of variables and clauses.
+            // Is a problem statement. Extract the number of variables and clauses.
         else if(first_char == 'p') {
             std::string str;
             std::stringstream ss(value);
@@ -74,24 +74,21 @@ int main() {
         std::cout << std::endl;
     }
 
-    BruteForceSolver solver(clauses, num_variables);
+    /*BruteForceSolver solver(clauses, num_variables);
     auto all_instances = solver.iter_solve();
 
     auto sat = solver.solve();
-    /*for(const auto &sat : all_instances) {
+    for(const auto &sat : all_instances) {
         for(auto v : sat) {
             std::cout << v << " ";
         }
         std::cout << std::endl;
-    }*/
+    }
 
-    solver.output_to_file();
+    solver.output_to_file();*/
 
     DPLLSolver solver2(clauses, num_variables);
-    auto temp = solver2.pq.top();
-
-    for(auto e : temp) {
-        std::cout << e << "-";
-    }
+    int res = solver2.solve();
+    std::cout << res;
     return 0;
 }

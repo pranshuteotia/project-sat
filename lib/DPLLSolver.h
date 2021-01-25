@@ -1,9 +1,10 @@
 //
-// Created by prans on 12/6/2020.
+// Created by Pranshu Teotia on 12/6/2020.
 //
 #include<vector>
 #include <unordered_map>
 #include <queue>
+#include <algorithm>
 #include "../obj/Clause.h"
 
 #ifndef PROJECT_SAT_DPLLSOLVER_H
@@ -23,18 +24,26 @@ private:
 
     size_t literal_to_index(int literal) const {
         if (literal > 0) { return (literal << 1); }
-        else { ((-literal) << 1) + 1; }
+        else { return ((-literal) << 1) + 1; }
     }
 
     std::vector<std::unordered_set<size_t>> _watch_list;
     std::vector<size_t>::iterator _pq_start, _pq_end;
     size_t _num_variables;
+    std::vector<int> _literals;
     const SizeComp _size_comp;
+
+    void pure_literal_elimination();
+
+    void unit_propagation(int literal);
+
 public:
     DPLLSolver(const std::vector<std::vector<int>>& clauses, size_t num_variables);
+    DPLLSolver(const DPLLSolver &o, SizeComp sizeComp);
 
     std::vector<Clause> _clause_objects;
     std::vector<size_t> _pq;
+    int solve();
 
 };
 
