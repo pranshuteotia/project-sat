@@ -28,6 +28,11 @@ struct Clause {
         }
     }
 
+    void undoLastModification() {
+        _literals = std::move(_undoStack.top());
+        _undoStack.pop();
+    }
+
     int size() const { return _literals.size(); }
 
     bool operator==(const Clause& c) const {
