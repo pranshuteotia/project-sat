@@ -32,15 +32,17 @@ private:
     size_t _num_variables;
     std::vector<int> _literals;
     const SizeComp _size_comp;
-
+    std::vector<bool> _assignments;
+    std::stack<std::pair<int, std::unordered_set<size_t>>> _modifications;
     void pure_literal_elimination();
-
     void unit_propagation(int literal);
+    int pick_literal();
+    int _clauses_removed;
 
 public:
     DPLLSolver(const std::vector<std::vector<int>>& clauses, size_t num_variables);
     DPLLSolver(const DPLLSolver &o, SizeComp sizeComp);
-
+    std::vector<bool> get_assignments();
     std::vector<Clause> _clause_objects;
     std::vector<size_t> _pq;
     int solve();
