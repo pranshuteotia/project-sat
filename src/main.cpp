@@ -88,7 +88,19 @@ int main() {
     solver.output_to_file();*/
 
     DPLLSolver solver2(clauses, num_variables);
-    int res = solver2.solve();
-    std::cout << res;
+    if(solver2.solve()) {
+        std::string vars, assignments;
+        auto assignments_vector = solver2.get_assignments();
+
+        for(size_t i=1; i<assignments_vector.size(); ++i) {
+            vars.append(std::to_string(i) + " ");
+            assignments.append((assignments_vector[i])? "T ": "F " );
+        }
+
+        std::cout << vars << '\n' << assignments << std::endl;
+
+    } else {
+        std::cout << "Unsatisfiable" << std::endl;
+    }
     return 0;
 }

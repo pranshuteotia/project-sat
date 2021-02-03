@@ -33,7 +33,7 @@ private:
     std::vector<int> _literals;
     const SizeComp _size_comp;
     std::vector<bool> _assignments;
-    std::stack<std::pair<int, std::unordered_set<size_t>>> _modifications;
+    std::stack<std::vector<std::pair<int, int>>> _modifications;
     void pure_literal_elimination();
     void unit_propagation(int literal);
     int pick_literal();

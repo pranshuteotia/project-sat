@@ -13,11 +13,18 @@ struct Clause {
     std::unordered_set<int> _literals;
     std::stack<std::unordered_set<int>> _undoStack;
     size_t _id;
+    bool _isEmpty;
+
+    Clause(): _isEmpty(false) {}
 
     void removeLiteral(int literal) {
         if (_literals.count(literal) > 0) {
             _undoStack.emplace(_literals);
             _literals.erase(literal);
+        }
+
+        if(_literals.empty()) {
+            _isEmpty = true;
         }
     }
 
