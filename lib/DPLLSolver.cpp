@@ -36,9 +36,9 @@ void DPLLSolver::unit_propagation(int literal) {
     for(auto id : clause_ids) {
         ++this->_clauses_removed;
 
-        for(auto literal : this->_clause_objects[id]._literals) {
+        for(int l : this->_clause_objects[id]._literals) {
             s1.push_back(std::make_pair(literal, id));
-            this->_watch_list[literal_to_index(literal)].erase(id);
+            this->_watch_list[literal_to_index(l)].erase(id);
         }
         this->_clause_objects[id].clearClause();
     }
@@ -49,10 +49,8 @@ void DPLLSolver::unit_propagation(int literal) {
     std::vector<std::pair<int, int>> s2;
     for(auto id : other_clause_ids) {
 
-        for(auto literal : this->_clause_objects[id]._literals) {
-            s2.push_back(std::make_pair(literal, id));
-            this->_watch_list[literal_to_index(literal)].erase(id);
-        }
+
+        s2.push_back(std::make_pair(-literal, id));
         this->_clause_objects[id].removeLiteral(-literal);
     }
     this->_modifications.push(s2);
@@ -71,6 +69,10 @@ int DPLLSolver::solve() {
     }
 
     int literal = this->pick_literal();
+    if(literal == 0) {
+        return 0;
+    }
+
     this->_assignments[(int)std::abs(literal)] = literal > 0;
     unit_propagation(literal);
     int result = solve();
@@ -114,7 +116,47 @@ int DPLLSolver::solve() {
         this->_assignments[std::abs(literal)] = !this->_assignments[std::abs(literal)];
         unit_propagation(-literal);
         result = solve();
+
+        if(result == 1) {
+            return 1;
+        }
+
+        // Undo all changes.
+
+        // reinsert deleted literals.
+        s2 = this->_modifications.top();
+        current_literal = -1;
+        for(auto pair : s2) {
+            int literal = pair.first;
+            int clause_id = pair.second;
+            this->_watch_list[literal_to_index(literal)].insert(clause_id);
+
+            if(current_literal != literal) {
+                current_literal = literal;
+                this->_clause_objects[clause_id].undoLastModification();
+            }
+        }
+        _modifications.pop();
+
+        // reinsert deleted clauses.
+        s1 = this->_modifications.top();
+        current_literal = -1;
+
+        for(auto pair : s1) {
+            int literal = pair.first;
+            int clause_id = pair.second;
+            this->_watch_list[literal_to_index(literal)].insert(clause_id);
+
+            if(current_literal != literal) {
+                current_literal = literal;
+                this->_clause_objects[clause_id].undoLastModification();
+                --this->_clauses_removed;
+            }
+        }
+        this->_modifications.pop();
     }
+
+    this->_literals.push_back(std::abs(literal));
 
     return result;
 }
@@ -124,6 +166,9 @@ std::vector<bool> DPLLSolver::get_assignments() {
 }
 
 int DPLLSolver::pick_literal() {
+    if(this->_literals.size() == 0) {
+        return 0;
+    }
     int literal = this->_literals.back();
     this->_literals.pop_back();
     return literal;

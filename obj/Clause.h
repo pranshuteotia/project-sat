@@ -38,6 +38,10 @@ struct Clause {
     void undoLastModification() {
         _literals = std::move(_undoStack.top());
         _undoStack.pop();
+
+        if(!_literals.empty()) {
+            _isEmpty = false;
+        }
     }
 
     int size() const { return _literals.size(); }

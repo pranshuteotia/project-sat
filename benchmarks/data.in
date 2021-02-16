@@ -1,6 +1,18 @@
 c This is a comment
 c This is another comment
-p cnf 6 3
-1 -2 3 0
-2 4 5 0
-4 6 0
+c p cnf 5 4
+c -1 -2 0
+c -1 2 -3 0
+c 3 -4 -5 0
+c 3 4 -5 0
+c p cnf 6 3
+c 1 -2 3 0
+c 2 4 5 0
+c 4 6 0
+p cnf 6 6
+1 -2 -3 0
+2 -3 -4 0
+3 -4 -5 0
+4 -5 -6 0
+5 -6 -1 0
+6 -1 -2 0
