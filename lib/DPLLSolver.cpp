@@ -37,18 +37,17 @@ void DPLLSolver::unit_propagation(int literal) {
         ++this->_clauses_removed;
 
         for(int l : this->_clause_objects[id]._literals) {
-            s1.push_back(std::make_pair(literal, id));
+            s1.push_back(std::make_pair(l, id));
             this->_watch_list[literal_to_index(l)].erase(id);
         }
         this->_clause_objects[id].clearClause();
     }
     _modifications.push(s1);
-    this->_watch_list[literal_to_index(literal)].clear();
+//    this->_watch_list[literal_to_index(literal)].clear();
 
     auto other_clause_ids = this->_watch_list[literal_to_index(-literal)];
     std::vector<std::pair<int, int>> s2;
     for(auto id : other_clause_ids) {
-
 
         s2.push_back(std::make_pair(-literal, id));
         this->_clause_objects[id].removeLiteral(-literal);
@@ -80,38 +79,7 @@ int DPLLSolver::solve() {
     // If that branch was unsatisfiable then flip the literal assignment and try to solve.
     if(result == 0) {
         // Undo all changes.
-
-        // reinsert deleted literals.
-        auto s2 = this->_modifications.top();
-        int current_literal = -1;
-        for(auto pair : s2) {
-            int literal = pair.first;
-            int clause_id = pair.second;
-            this->_watch_list[literal_to_index(literal)].insert(clause_id);
-
-            if(current_literal != literal) {
-                current_literal = literal;
-                this->_clause_objects[clause_id].undoLastModification();
-            }
-        }
-        _modifications.pop();
-
-        // reinsert deleted clauses.
-        auto s1 = this->_modifications.top();
-        current_literal = -1;
-
-        for(auto pair : s1) {
-            int literal = pair.first;
-            int clause_id = pair.second;
-            this->_watch_list[literal_to_index(literal)].insert(clause_id);
-
-            if(current_literal != literal) {
-                current_literal = literal;
-                this->_clause_objects[clause_id].undoLastModification();
-                --this->_clauses_removed;
-            }
-        }
-        this->_modifications.pop();
+        this->undo_state();
 
         this->_assignments[std::abs(literal)] = !this->_assignments[std::abs(literal)];
         unit_propagation(-literal);
@@ -121,39 +89,7 @@ int DPLLSolver::solve() {
             return 1;
         }
 
-        // Undo all changes.
-
-        // reinsert deleted literals.
-        s2 = this->_modifications.top();
-        current_literal = -1;
-        for(auto pair : s2) {
-            int literal = pair.first;
-            int clause_id = pair.second;
-            this->_watch_list[literal_to_index(literal)].insert(clause_id);
-
-            if(current_literal != literal) {
-                current_literal = literal;
-                this->_clause_objects[clause_id].undoLastModification();
-            }
-        }
-        _modifications.pop();
-
-        // reinsert deleted clauses.
-        s1 = this->_modifications.top();
-        current_literal = -1;
-
-        for(auto pair : s1) {
-            int literal = pair.first;
-            int clause_id = pair.second;
-            this->_watch_list[literal_to_index(literal)].insert(clause_id);
-
-            if(current_literal != literal) {
-                current_literal = literal;
-                this->_clause_objects[clause_id].undoLastModification();
-                --this->_clauses_removed;
-            }
-        }
-        this->_modifications.pop();
+        this->undo_state();
     }
 
     this->_literals.push_back(std::abs(literal));
@@ -172,4 +108,34 @@ int DPLLSolver::pick_literal() {
     int literal = this->_literals.back();
     this->_literals.pop_back();
     return literal;
+}
+
+void DPLLSolver::undo_state() {
+    // reinsert deleted literals.
+    auto s2 = this->_modifications.top();
+    for(auto pair : s2) {
+        int literal = pair.first;
+        int clause_id = pair.second;
+        this->_watch_list[literal_to_index(literal)].insert(clause_id);
+
+        this->_clause_objects[clause_id].undoLastModification();
+    }
+    _modifications.pop();
+
+    // reinsert deleted clauses.
+    auto s1 = this->_modifications.top();
+    int current_clause = -1;
+
+    for(auto pair : s1) {
+        int literal = pair.first;
+        int clause_id = pair.second;
+        this->_watch_list[literal_to_index(literal)].insert(clause_id);
+
+        if(current_clause != clause_id) {
+            current_clause = clause_id;
+            this->_clause_objects[clause_id].undoLastModification();
+            --this->_clauses_removed;
+        }
+    }
+    this->_modifications.pop();
 }

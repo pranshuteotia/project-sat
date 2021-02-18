@@ -38,6 +38,7 @@ private:
     void unit_propagation(int literal);
     int pick_literal();
     int _clauses_removed;
+    void undo_state();
 
 public:
     DPLLSolver(const std::vector<std::vector<int>>& clauses, size_t num_variables);

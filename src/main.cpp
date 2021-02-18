@@ -3,6 +3,7 @@
 #include <sstream>
 #include "../lib/BruteForceSolver.h"
 #include "../lib/DPLLSolver.h"
+#include <chrono>
 
 std::pair<std::vector<std::vector<int>>, int> parse_file(const char *const filename) {
     std::vector<std::vector<int>> clauses;
@@ -66,13 +67,13 @@ int main() {
     auto clauses = result.first;
     int num_variables = result.second;
 
-    for(const auto &clause : clauses) {
+    /*for(const auto &clause : clauses) {
         for(auto literal : clause) {
             std::cout << literal << ' ';
         }
 
         std::cout << std::endl;
-    }
+    }*/
 
     /*BruteForceSolver solver(clauses, num_variables);
     auto all_instances = solver.iter_solve();
@@ -86,7 +87,7 @@ int main() {
     }
 
     solver.output_to_file();*/
-
+    auto start = std::chrono::steady_clock::now();
     DPLLSolver solver2(clauses, num_variables);
     if(solver2.solve()) {
         std::string vars, assignments;
@@ -102,5 +103,8 @@ int main() {
     } else {
         std::cout << "Unsatisfiable" << std::endl;
     }
+    auto end = std::chrono::steady_clock::now();
+    std::chrono::duration<double, std::milli> time = end-start;
+    std::cout << time.count()/1000 << std::endl;
     return 0;
 }
