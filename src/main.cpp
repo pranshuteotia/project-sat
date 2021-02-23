@@ -4,19 +4,19 @@
 #include "../lib/BruteForceSolver.h"
 #include "../lib/DPLLSolver.h"
 #include <chrono>
+#include <fstream>
 
-std::pair<std::vector<std::vector<int>>, int> parse_file(const char *const filename) {
+std::pair<std::vector<std::vector<int>>, int> parse_file(std::string filename) {
     std::vector<std::vector<int>> clauses;
     std::vector<int> variables;
     std::vector<std::string> problem;
 
-    std::freopen(filename, "r", stdin);
+    std::ifstream f (filename, std::ifstream::in);
     std::string value;
     int num_variables;
-    int num_clauses;
 
     // Going over the file line by line.
-    while(getline(std::cin, value)) {
+    while(getline(f, value)) {
         char first_char = value[0];
 
         // It's a comment. Should be ignored.
@@ -35,7 +35,6 @@ std::pair<std::vector<std::vector<int>>, int> parse_file(const char *const filen
 
             // Extracting the number of clause and variables.
             num_variables = std::stoi(problem[2]);
-            num_clauses = std::stoi(problem[3]);
 
         } else {
             std::string str;
@@ -62,35 +61,9 @@ std::pair<std::vector<std::vector<int>>, int> parse_file(const char *const filen
 }
 
 int main() {
-    auto start = std::chrono::steady_clock::now();
-    for(size_t i=0; i<1000; ++i) {
-        std::string filename = "CBS_k3_n100_m403_b10_" + std::to_string(i) + ".cnf";
-
-        auto result = parse_file("data.in");
-        auto clauses = result.first;
-        int num_variables = result.second;
-
-        DPLLSolver solver2(clauses, num_variables);
-
-        if (solver2.solve()) {
-            std::cout << "Instance: " << i << " Satisfiable!" << std::endl;
-
-        } else {
-            std::cout << "Instance: " << i << " Unsatisfiable!" << std::endl;
-            auto end = std::chrono::steady_clock::now();
-            std::chrono::duration<double, std::milli> time = end-start;
-            std::cout << time.count()/1000 << std::endl;
-            return 1;
-        }
-    }
-    auto end = std::chrono::steady_clock::now();
-    std::chrono::duration<double, std::milli> time = end-start;
-    std::cout << time.count()/1000 << std::endl;
-    /*auto result = parse_file("data.in");
+    auto result = parse_file("data.in");
     auto clauses = result.first;
-    int num_variables = result.second;*/
-
-    //======================================
+    int num_variables = result.second;
 
     /*for(const auto &clause : clauses) {
         for(auto literal : clause) {
@@ -113,9 +86,7 @@ int main() {
 
     solver.output_to_file();*/
 
-    // ====================================
-
-    /*auto start = std::chrono::steady_clock::now();
+    auto start = std::chrono::steady_clock::now();
     DPLLSolver solver2(clauses, num_variables);
     if(solver2.solve()) {
         std::string vars, assignments;
@@ -133,6 +104,7 @@ int main() {
     }
     auto end = std::chrono::steady_clock::now();
     std::chrono::duration<double, std::milli> time = end-start;
-    std::cout << time.count()/1000 << std::endl;*/
+    std::cout << time.count()/1000 << std::endl;
+    
     return 0;
 }
