@@ -14,8 +14,9 @@ struct Clause {
     std::stack<std::unordered_set<int>> _undoStack;
     size_t _id;
     bool _isEmpty;
+    bool _isUnit;
 
-    Clause(): _isEmpty(false) {}
+    Clause(): _isEmpty(false), _isUnit(false) {}
 
     void removeLiteral(int literal) {
         if (_literals.count(literal) > 0) {
@@ -25,6 +26,11 @@ struct Clause {
 
         if(_literals.empty()) {
             _isEmpty = true;
+            _isUnit = false;
+
+        }
+        if (_literals.size() == 1) {
+            _isUnit = true;
         }
     }
 
@@ -33,12 +39,21 @@ struct Clause {
             _undoStack.emplace(_literals);
             _literals.clear();
         }
+
+        _isUnit = false;
     }
 
     void undoLastModification() {
         _literals = std::move(_undoStack.top());
         _undoStack.pop();
 
+        if(_literals.size() == 1) {
+            _isUnit = true;
+        }
+        if(_literals.size() > 1) {
+            _isUnit = false;
+
+        }
         if(!_literals.empty()) {
             _isEmpty = false;
         }

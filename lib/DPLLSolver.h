@@ -30,15 +30,18 @@ private:
     std::vector<std::unordered_set<size_t>> _watch_list;
     std::vector<size_t>::iterator _pq_start, _pq_end;
     size_t _num_variables;
-    std::vector<int> _literals;
+    std::vector<std::pair<int, size_t>> _literals;
     const SizeComp _size_comp;
     std::vector<bool> _assignments;
     std::stack<std::vector<std::pair<int, int>>> _modifications;
     void pure_literal_elimination();
-    void unit_propagation(int literal);
+    void unit_propagation();
     int pick_literal();
     int _clauses_removed;
+    std::vector<std::pair<int, int>> *_deleted_clauses;
+    std::vector<std::pair<int, int>> *_deleted_literals;
     void undo_state();
+    void apply_literal(const int &literal);
 
 public:
     DPLLSolver(const std::vector<std::vector<int>>& clauses, size_t num_variables);
