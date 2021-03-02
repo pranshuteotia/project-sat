@@ -4,12 +4,10 @@
 
 #include "DPLLSolver.h"
 
-DPLLSolver::DPLLSolver(const std::vector<std::vector<int>>& clauses, size_t num_variables) : _clause_objects(std::vector<Clause>(clauses.size(), Clause())), _watch_list(std::vector<std::unordered_set<size_t>>((num_variables << 1) + 2)), _pq(std::vector<size_t>(clauses.size())), _size_comp({*this}) {
+DPLLSolver::DPLLSolver(const std::vector<std::vector<int>>& clauses, size_t num_variables) : _clause_objects(std::vector<Clause>(clauses.size(), Clause())), _watch_list(std::vector<std::unordered_set<size_t>>((num_variables << 1) + 2)), _pq(std::vector<size_t>(clauses.size())) {
     this->_num_variables = num_variables;
     this->_assignments = std::vector<bool>(this->_num_variables+1, false);
     this->_clauses_removed = 0;
-    this->_deleted_clauses = nullptr;
-    this->_deleted_literals = nullptr;
 
     this->_literals.emplace_back(-2, 0);
     for(size_t i=1; i<=num_variables; ++i) this->_literals.emplace_back(0, i);
@@ -28,19 +26,30 @@ DPLLSolver::DPLLSolver(const std::vector<std::vector<int>>& clauses, size_t num_
     }
     this->_pq_start = _pq.begin();
     this->_pq_end = _pq.end();
-    std::make_heap(this->_pq_start,this->_pq_end,_size_comp);
 }
 
-void DPLLSolver::unit_propagation() {
+DPLLSolver::DPLLSolver(DPLLSolver const &o) {
+    this->_num_variables = o._num_variables;
+    this->_assignments = o._assignments;
+    this->_clauses_removed = o._clauses_removed;
+    this->_literals = o._literals;
+    this->_clause_objects = o._clause_objects;
+    this->_pq = o._pq;
+    this->_pq_start = o._pq_start;
+    this->_pq_end = o._pq_end;
+    this->_watch_list = o._watch_list;
+}
+
+void DPLLSolver::unit_propagation(DPLLSolver &f) {
     bool unit_clause_found;
     do {
         unit_clause_found = false;
-        for(const auto &clause : this->_clause_objects) {
+        for(const auto &clause : f._clause_objects) {
             if(clause._isUnit) {
                 unit_clause_found = true;
                 int literal = *clause._literals.begin();
-                this->_assignments[std::abs(literal)] = literal > 0;
-                this->apply_literal(literal);
+                f._assignments[std::abs(literal)] = literal > 0;
+                f.apply_literal(f, literal);
             }
         }
 
@@ -49,53 +58,48 @@ void DPLLSolver::unit_propagation() {
 }
 
 int DPLLSolver::solve() {
-    if(this->_clause_objects.size() == this->_clauses_removed) {
+    DPLLSolver original = *this;
+    return this->DPLL(original);
+}
+
+int DPLLSolver::DPLL(DPLLSolver &f) {
+    if(f._clause_objects.size() == f._clauses_removed) {
         return 1; // No clauses = Satisfiable
     }
     
-    for(const Clause &c : this->_clause_objects) {
+    for(const Clause &c : f._clause_objects) {
         if(c._isEmpty) {
             return  0; // Empty clause = Unsatisfiable
         }
     }
 
-    int literal = this->pick_literal();
+    DPLLSolver new_f = f;
+
+    int literal = new_f.pick_literal();
     if(literal == 0) {
         return 0;
     }
 
-    this->_modifications.push(std::vector<std::pair<int, int>>());
-    this->_deleted_clauses = &this->_modifications.top();
-    this->_modifications.push(std::vector<std::pair<int, int>>());
-    this->_deleted_literals = &this->_modifications.top();
+    new_f._assignments[std::abs(literal)] = literal > 0;
+    unit_propagation(new_f);
+    apply_literal(new_f, literal);
 
-    this->_assignments[std::abs(literal)] = literal > 0;
-    unit_propagation();
-    apply_literal(literal);
-
-    int result = solve();
+    int result = DPLL(new_f);
 
     // If that branch was unsatisfiable then flip the literal assignment and try to solve.
     if(result == 0) {
         // Undo all changes.
-        this->undo_state();
+        DPLLSolver new_f2= f;
+        new_f2._assignments[std::abs(literal)] = literal <= 0;
 
-        this->_assignments[std::abs(literal)] = !this->_assignments[std::abs(literal)];
 
-        this->_modifications.push(std::vector<std::pair<int, int>>());
-        this->_deleted_clauses = &this->_modifications.top();
-        this->_modifications.push(std::vector<std::pair<int, int>>());
-        this->_deleted_literals = &this->_modifications.top();
-
-        unit_propagation();
-        apply_literal(-literal);
-        result = solve();
+        unit_propagation(new_f2);
+        apply_literal(new_f2, -literal);
+        result = DPLL(new_f2);
 
         if(result == 1) {
             return 1;
         }
-
-        this->undo_state();
     }
 
     return result;
@@ -117,46 +121,13 @@ int DPLLSolver::pick_literal() {
     return (this->_watch_list[this->literal_to_index(var)].size() > this->_watch_list[this->literal_to_index(-var)].size())? var : -var;
 }
 
-void DPLLSolver::undo_state() {
-    // reinsert deleted literals.
-    auto s = this->_modifications.top();
-    for(auto pair : s) {
-        int literal = pair.first;
-        int clause_id = pair.second;
-        this->_watch_list[literal_to_index(literal)].insert(clause_id);
-        this->_literals[std::abs(literal)].first++;
-
-        this->_clause_objects[clause_id].undoLastModification();
-    }
-    _modifications.pop();
-
-    // reinsert deleted clauses.
-    s = this->_modifications.top();
-    int current_clause = -1;
-
-    for(auto pair : s) {
-        int literal = pair.first;
-        int clause_id = pair.second;
-        this->_watch_list[literal_to_index(literal)].insert(clause_id);
-        this->_literals[std::abs(-literal)].first++;
-
-        if(current_clause != clause_id) {
-            current_clause = clause_id;
-            this->_clause_objects[clause_id].undoLastModification();
-            --this->_clauses_removed;
-        }
-    }
-    this->_modifications.pop();
-}
-
-void DPLLSolver::apply_literal(const int &literal) {
+void DPLLSolver::apply_literal(DPLLSolver &f, const int &literal) {
     auto clause_ids = this->_watch_list[literal_to_index(literal)];
 
     for(auto id : clause_ids) {
         ++this->_clauses_removed;
 
         for(int l : this->_clause_objects[id]._literals) {
-            this->_deleted_clauses->emplace_back(l, id);
             this->_literals[std::abs(l)].first--;
             this->_watch_list[literal_to_index(l)].erase(id);
         }
@@ -166,7 +137,6 @@ void DPLLSolver::apply_literal(const int &literal) {
     auto other_clause_ids = this->_watch_list[literal_to_index(-literal)];
     for(auto id : other_clause_ids) {
 
-        this->_deleted_literals->emplace_back(-literal, id);
         this->_literals[std::abs(-literal)].first--;
         this->_clause_objects[id].removeLiteral(-literal);
     }
