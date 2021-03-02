@@ -3,7 +3,6 @@
 //
 #include<vector>
 #include <unordered_map>
-#include <queue>
 #include <algorithm>
 #include "../obj/Clause.h"
 
@@ -16,13 +15,13 @@ private:
     struct SizeComp {
     public:
         const DPLLSolver& _solver;
-        SizeComp(const DPLLSolver& solver) : _solver(solver) {  }
+        explicit SizeComp(const DPLLSolver& solver) : _solver(solver) {  }
         bool operator()(const size_t& lhs, const size_t& rhs) const {
             return _solver._clause_objects[lhs]._literals.size() > _solver._clause_objects[rhs]._literals.size();
         }
     } ;
 
-    size_t literal_to_index(int literal) const {
+    static size_t literal_to_index(int literal) {
         if (literal > 0) { return (literal << 1); }
         else { return ((-literal) << 1) + 1; }
     }
@@ -33,19 +32,13 @@ private:
     std::vector<std::pair<int, size_t>> _literals;
     const SizeComp _size_comp;
     std::vector<bool> _assignments;
-    std::stack<std::vector<std::pair<int, int>>> _modifications;
-    void pure_literal_elimination();
     void unit_propagation();
     int pick_literal();
     int _clauses_removed;
-    std::vector<std::pair<int, int>> *_deleted_clauses;
-    std::vector<std::pair<int, int>> *_deleted_literals;
-    void undo_state();
     void apply_literal(const int &literal);
 
 public:
     DPLLSolver(const std::vector<std::vector<int>>& clauses, size_t num_variables);
-    DPLLSolver(const DPLLSolver &o, SizeComp sizeComp);
     std::vector<bool> get_assignments();
     std::vector<Clause> _clause_objects;
     std::vector<size_t> _pq;

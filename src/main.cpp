@@ -6,7 +6,7 @@
 #include <chrono>
 #include <fstream>
 
-std::pair<std::vector<std::vector<int>>, int> parse_file(std::string filename) {
+std::pair<std::vector<std::vector<int>>, int> parse_file(const std::string &filename) {
     std::vector<std::vector<int>> clauses;
     std::vector<int> variables;
     std::vector<std::string> problem;
@@ -64,27 +64,6 @@ int main() {
     auto result = parse_file("data.in");
     auto clauses = result.first;
     int num_variables = result.second;
-
-    /*for(const auto &clause : clauses) {
-        for(auto literal : clause) {
-            std::cout << literal << ' ';
-        }
-
-        std::cout << std::endl;
-    }*/
-
-    /*BruteForceSolver solver(clauses, num_variables);
-    auto all_instances = solver.iter_solve();
-
-    auto sat = solver.solve();
-    for(const auto &sat : all_instances) {
-        for(auto v : sat) {
-            std::cout << v << " ";
-        }
-        std::cout << std::endl;
-    }
-
-    solver.output_to_file();*/
 
     auto start = std::chrono::steady_clock::now();
     DPLLSolver solver2(clauses, num_variables);
