@@ -122,23 +122,23 @@ int DPLLSolver::pick_literal() {
 }
 
 void DPLLSolver::apply_literal(DPLLSolver &f, const int &literal) {
-    auto clause_ids = this->_watch_list[literal_to_index(literal)];
+    auto clause_ids = f._watch_list[literal_to_index(literal)];
 
     for(auto id : clause_ids) {
-        ++this->_clauses_removed;
+        ++f._clauses_removed;
 
-        for(int l : this->_clause_objects[id]._literals) {
-            this->_literals[std::abs(l)].first--;
-            this->_watch_list[literal_to_index(l)].erase(id);
+        for(int l : f._clause_objects[id]._literals) {
+            f._literals[std::abs(l)].first--;
+            f._watch_list[literal_to_index(l)].erase(id);
         }
-        this->_clause_objects[id].clearClause();
+        f._clause_objects[id].clearClause();
     }
 
-    auto other_clause_ids = this->_watch_list[literal_to_index(-literal)];
+    auto other_clause_ids = f._watch_list[literal_to_index(-literal)];
     for(auto id : other_clause_ids) {
 
-        this->_literals[std::abs(-literal)].first--;
-        this->_clause_objects[id].removeLiteral(-literal);
+        f._literals[std::abs(-literal)].first--;
+        f._clause_objects[id].removeLiteral(-literal);
     }
-    this->_watch_list[literal_to_index(-literal)].clear();
+    f._watch_list[literal_to_index(-literal)].clear();
 }
