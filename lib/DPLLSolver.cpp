@@ -172,3 +172,201 @@ void DPLLSolver::apply_literal(const int &literal) {
     }
     this->_watch_list[literal_to_index(-literal)].clear();
 }
+
+// No Stack implementation
+
+int DPLLSolver::solve_no_stack() {
+    if(this->_clause_objects.size() == this->_clauses_removed) {
+        return 1; // No clauses = Satisfiable
+    }
+
+    for(const Clause &c : this->_clause_objects) {
+        if(c._isEmpty) {
+            return  0; // Empty clause = Unsatisfiable
+        }
+    }
+
+    int literal = this->pick_literal();
+    if(literal == 0) {
+        return 0;
+    }
+
+    std::vector<Clause> clause_objects_copy = this->_clause_objects;
+    std::vector<std::unordered_set<size_t>> watch_list_copy = this->_watch_list;
+    size_t clauses_removed_copy = this->_clauses_removed;
+    std::vector<std::pair<int, size_t>> literals_copy = this->_literals;
+
+    this->_assignments[std::abs(literal)] = literal > 0;
+    unit_propagation_no_stack();
+    apply_literal_no_stack(literal);
+
+    int result = solve_no_stack();
+
+    // If that branch was unsatisfiable then flip the literal assignment and try to solve.
+    if(result == 0) {
+        // Undo all changes.
+        this->_clause_objects = clause_objects_copy;
+        this->_watch_list = watch_list_copy;
+        this->_clauses_removed = clauses_removed_copy;
+        this->_literals = literals_copy;
+
+        this->_assignments[std::abs(literal)] = literal <= 0;
+
+        unit_propagation_no_stack();
+        apply_literal_no_stack(-literal);
+        result = solve_no_stack();
+
+        if(result == 1) {
+            return 1;
+        }
+
+        this->_clause_objects = clause_objects_copy;
+        this->_watch_list = watch_list_copy;
+        this->_clauses_removed = clauses_removed_copy;
+        this->_literals = literals_copy;
+    }
+
+    return result;
+}
+
+void DPLLSolver::unit_propagation_no_stack() {
+    bool unit_clause_found;
+    do {
+        unit_clause_found = false;
+        for(const auto &clause : this->_clause_objects) {
+            if(clause._isUnit) {
+                unit_clause_found = true;
+                int literal = *clause._literals.begin();
+                this->_assignments[std::abs(literal)] = literal > 0;
+                this->apply_literal_no_stack(literal);
+            }
+        }
+
+    } while(unit_clause_found);
+}
+
+void DPLLSolver::apply_literal_no_stack(const int &literal) {
+    auto clause_ids = this->_watch_list[literal_to_index(literal)];
+
+    for(auto id : clause_ids) {
+        ++this->_clauses_removed;
+
+        for(int l : this->_clause_objects[id]._literals) {
+            this->_literals[std::abs(l)].first--;
+            this->_watch_list[literal_to_index(l)].erase(id);
+        }
+        this->_clause_objects[id].clearClause();
+    }
+
+    auto other_clause_ids = this->_watch_list[literal_to_index(-literal)];
+    for(auto id : other_clause_ids) {
+
+        this->_literals[std::abs(-literal)].first--;
+        this->_clause_objects[id].removeLiteral(-literal);
+    }
+    this->_watch_list[literal_to_index(-literal)].clear();
+}
+
+// Copy Constructor impl.
+
+DPLLSolver::DPLLSolver(DPLLSolver const &o, const SizeComp sizeComp) : _size_comp(sizeComp) {
+    this->_num_variables = o._num_variables;
+    this->_assignments = o._assignments;
+    this->_clauses_removed = o._clauses_removed;
+    this->_literals = o._literals;
+    this->_clause_objects = o._clause_objects;
+    this->_pq = o._pq;
+    this->_pq_start = o._pq_start;
+    this->_pq_end = o._pq_end;
+    this->_watch_list = o._watch_list;
+}
+
+void DPLLSolver::unit_propagation_copy_constructor(DPLLSolver &f) {
+    bool unit_clause_found;
+    do {
+        unit_clause_found = false;
+        for(const auto &clause : f._clause_objects) {
+            if(clause._isUnit) {
+                unit_clause_found = true;
+                int literal = *clause._literals.begin();
+                f._assignments[std::abs(literal)] = literal > 0;
+                f.apply_literal_copy_constructor(f, literal);
+            }
+        }
+
+    } while(unit_clause_found);
+}
+
+int DPLLSolver::solve_copy_constructor() {
+    DPLLSolver original = *this;
+    return this->DPLL(original);
+}
+
+int DPLLSolver::DPLL(DPLLSolver &f) {
+    if(f._clause_objects.size() == f._clauses_removed) {
+        return 1; // No clauses = Satisfiable
+    }
+
+    for(const Clause &c : f._clause_objects) {
+        if(c._isEmpty) {
+            return  0; // Empty clause = Unsatisfiable
+        }
+    }
+
+    DPLLSolver new_f = f;
+
+    int literal = new_f.pick_literal();
+    if(literal == 0) {
+        return 0;
+    }
+
+    new_f._assignments[std::abs(literal)] = literal > 0;
+    unit_propagation_copy_constructor(new_f);
+    apply_literal_copy_constructor(new_f, literal);
+
+    int result = DPLL(new_f);
+
+    // If that branch was unsatisfiable then flip the literal assignment and try to solve.
+    if(result == 0) {
+        // Undo all changes.
+        DPLLSolver new_f2= f;
+        new_f2._assignments[std::abs(literal)] = literal <= 0;
+
+
+        unit_propagation_copy_constructor(new_f2);
+        apply_literal_copy_constructor(new_f2, -literal);
+        result = DPLL(new_f2);
+
+        if(result == 1) {
+            return 1;
+        }
+    }
+
+    return result;
+}
+
+void DPLLSolver::apply_literal_copy_constructor(DPLLSolver &f, const int &literal) {
+    auto clause_ids = f._watch_list[literal_to_index(literal)];
+
+    for(auto id : clause_ids) {
+        ++f._clauses_removed;
+
+        for(int l : f._clause_objects[id]._literals) {
+            f._literals[std::abs(l)].first--;
+            f._watch_list[literal_to_index(l)].erase(id);
+        }
+        f._clause_objects[id].clearClause();
+    }
+
+    auto other_clause_ids = f._watch_list[literal_to_index(-literal)];
+    for(auto id : other_clause_ids) {
+
+        f._literals[std::abs(-literal)].first--;
+        f._clause_objects[id].removeLiteral(-literal);
+    }
+    f._watch_list[literal_to_index(-literal)].clear();
+}
+
+void DPLLSolver::reset_assignments() {
+    this->_assignments = std::vector<bool>(this->_num_variables+1, false);
+}

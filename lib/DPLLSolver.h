@@ -43,6 +43,15 @@ private:
     void undo_state();
     void apply_literal(const int &literal);
 
+    // No stack impl.
+    void unit_propagation_no_stack();
+    void apply_literal_no_stack(const int &literal);
+
+    // Copy constructor impl.
+    void unit_propagation_copy_constructor(DPLLSolver &f);
+    int DPLL(DPLLSolver &f);
+    void apply_literal_copy_constructor(DPLLSolver &f, const int &literal);
+
 public:
     DPLLSolver(const std::vector<std::vector<int>>& clauses, size_t num_variables);
     DPLLSolver(const DPLLSolver &o, SizeComp sizeComp);
@@ -50,6 +59,9 @@ public:
     std::vector<Clause> _clause_objects;
     std::vector<size_t> _pq;
     int solve();
+    int solve_copy_constructor();
+    int solve_no_stack();
+    void reset_assignments();
 
 };
 

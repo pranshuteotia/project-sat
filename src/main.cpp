@@ -60,6 +60,17 @@ std::pair<std::vector<std::vector<int>>, int> parse_file(std::string filename) {
     return std::make_pair(clauses, num_variables);
 }
 
+std::string print_assignments(std::vector<bool> v) {
+    std::string vars, assignments;
+
+    for(size_t i=1; i<v.size(); ++i) {
+        vars.append(std::to_string(i) + " ");
+        assignments.append((v[i])? "T ": "F " );
+    }
+
+    return assignments;
+}
+
 int main() {
     auto result = parse_file("data.in");
     auto clauses = result.first;
@@ -86,22 +97,32 @@ int main() {
 
     solver.output_to_file();*/
 
+
     auto start = std::chrono::steady_clock::now();
     DPLLSolver solver2(clauses, num_variables);
     if(solver2.solve()) {
-        std::string vars, assignments;
-        auto assignments_vector = solver2.get_assignments();
-
-        for(size_t i=1; i<assignments_vector.size(); ++i) {
-            vars.append(std::to_string(i) + " ");
-            assignments.append((assignments_vector[i])? "T ": "F " );
-        }
-
-        std::cout << vars << '\n' << assignments << std::endl;
+        std::cout << print_assignments(solver2.get_assignments()) << std::endl << std::endl;
 
     } else {
         std::cout << "Unsatisfiable" << std::endl;
     }
+
+    DPLLSolver solver1(clauses, num_variables);
+    if(solver1.solve_no_stack()) {
+        std::cout << print_assignments(solver2.get_assignments()) << std::endl << std::endl;
+
+    } else {
+        std::cout << "Damm1\n";
+    }
+
+    DPLLSolver solver3(clauses, num_variables);
+    if(solver3.solve_copy_constructor()) {
+        std::cout << print_assignments(solver2.get_assignments()) << std::endl << std::endl;
+
+    } else {
+        std::cout << "Damm2\n";
+    }
+
     auto end = std::chrono::steady_clock::now();
     std::chrono::duration<double, std::milli> time = end-start;
     std::cout << time.count()/1000 << std::endl;
