@@ -112,7 +112,7 @@ int main() {
         std::cout << print_assignments(solver2.get_assignments()) << std::endl << std::endl;
 
     } else {
-        std::cout << "Damm1\n";
+        std::cout << "Unsatisfiable\n";
     }
 
     DPLLSolver solver3(clauses, num_variables);
@@ -120,7 +120,7 @@ int main() {
         std::cout << print_assignments(solver2.get_assignments()) << std::endl << std::endl;
 
     } else {
-        std::cout << "Damm2\n";
+        std::cout << "Unsatisfiable\n";
     }
 
     auto end = std::chrono::steady_clock::now();
