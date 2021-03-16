@@ -3,7 +3,6 @@
 //
 
 #include "Heuristic.h"
-#include "../lib/DPLLSolver.h"
 
 void Heuristic::init() {
     size_t num_literals = 0;

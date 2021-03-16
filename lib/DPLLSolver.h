@@ -66,7 +66,6 @@ private:
 
     // Heuristics
 //    DLIS h;
-    friend class Heuristic;
 
 public:
     DPLLSolver(const std::vector<std::vector<int>>& clauses, size_t num_variables);
