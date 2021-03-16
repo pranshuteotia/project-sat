@@ -1,10 +1,10 @@
 //
-// Created by prans on 3/16/2021.
+// Created by Pranshu on 3/16/2021.
 //
-#include "Heuristic.h"
-
 #ifndef PROJECT_SAT_DLIS_H
 #define PROJECT_SAT_DLIS_H
+
+#include "Heuristic.h"
 
 class DLIS : public Heuristic {
 
