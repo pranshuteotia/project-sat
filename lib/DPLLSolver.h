@@ -6,6 +6,8 @@
 #include <queue>
 #include <algorithm>
 #include "../obj/Clause.h"
+#include "../obj/DLIS.h"
+#include "../obj/Heuristic.h"
 
 #ifndef PROJECT_SAT_DPLLSOLVER_H
 #define PROJECT_SAT_DPLLSOLVER_H
@@ -26,7 +28,6 @@ private:
         if (literal > 0) { return (literal << 1); }
         else { return ((-literal) << 1) + 1; }
     }
-
     std::vector<std::unordered_set<size_t>> _watch_list;
     std::vector<size_t>::iterator _pq_start, _pq_end;
     size_t _num_variables;
@@ -52,6 +53,10 @@ private:
     int DPLL(DPLLSolver &f);
     void apply_literal_copy_constructor(DPLLSolver &f, const int &literal);
 
+    // Heuristics
+    DLIS h;
+    friend class Heuristic;
+
 public:
     DPLLSolver(const std::vector<std::vector<int>>& clauses, size_t num_variables);
     DPLLSolver(const DPLLSolver &o, SizeComp sizeComp);
@@ -61,7 +66,6 @@ public:
     int solve();
     int solve_copy_constructor();
     int solve_no_stack();
-    void reset_assignments();
 
 };
 

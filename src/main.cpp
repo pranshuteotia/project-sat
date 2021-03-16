@@ -106,7 +106,11 @@ int main() {
     } else {
         std::cout << "Unsatisfiable" << std::endl;
     }
+    auto end = std::chrono::steady_clock::now();
+    std::chrono::duration<double, std::milli> time = end-start;
+    std::cout << time.count()/1000 << std::endl;
 
+    start = std::chrono::steady_clock::now();
     DPLLSolver solver1(clauses, num_variables);
     if(solver1.solve_no_stack()) {
         std::cout << print_assignments(solver2.get_assignments()) << std::endl << std::endl;
@@ -114,7 +118,11 @@ int main() {
     } else {
         std::cout << "Unsatisfiable\n";
     }
+    end = std::chrono::steady_clock::now();
+    time = end-start;
+    std::cout << time.count()/1000 << std::endl;
 
+    start = std::chrono::steady_clock::now();
     DPLLSolver solver3(clauses, num_variables);
     if(solver3.solve_copy_constructor()) {
         std::cout << print_assignments(solver2.get_assignments()) << std::endl << std::endl;
@@ -122,10 +130,13 @@ int main() {
     } else {
         std::cout << "Unsatisfiable\n";
     }
-
-    auto end = std::chrono::steady_clock::now();
-    std::chrono::duration<double, std::milli> time = end-start;
+    end = std::chrono::steady_clock::now();
+    time = end-start;
     std::cout << time.count()/1000 << std::endl;
+
+//    auto end = std::chrono::steady_clock::now();
+//    std::chrono::duration<double, std::milli> time = end-start;
+//    std::cout << time.count()/1000 << std::endl;
     
     return 0;
 }

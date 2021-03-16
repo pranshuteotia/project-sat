@@ -10,9 +10,9 @@ DPLLSolver::DPLLSolver(const std::vector<std::vector<int>>& clauses, size_t num_
     this->_clauses_removed = 0;
     this->_deleted_clauses = nullptr;
     this->_deleted_literals = nullptr;
-
     this->_literals.emplace_back(-2, 0);
     for(size_t i=1; i<=num_variables; ++i) this->_literals.emplace_back(0, i);
+    h.init();
 
     size_t clause_id = 0;
     for(const std::vector<int>& clause : clauses) {
@@ -107,7 +107,6 @@ std::vector<bool> DPLLSolver::get_assignments() {
 
 int DPLLSolver::pick_literal() {
     auto freq_literal_pair = std::max_element(this->_literals.begin(), this->_literals.end());
-//    freq_literal_pair->first = -1;
     int var = freq_literal_pair->second;
 
     if(freq_literal_pair->first == 0) {
@@ -367,6 +366,13 @@ void DPLLSolver::apply_literal_copy_constructor(DPLLSolver &f, const int &litera
     f._watch_list[literal_to_index(-literal)].clear();
 }
 
-void DPLLSolver::reset_assignments() {
-    this->_assignments = std::vector<bool>(this->_num_variables+1, false);
-}
+/*
+ * Each literal, l, has a score, s(l), and an occurrence
+    count, r(l). When a decision is necessary, a free literal with the highest score is set true.
+    Initially, for every literal, l, s(l) = r(l) = 0. Before search begins, s(l) is incremented for
+    each occurrence of a literal, l, in the input formula. When a clause, c, is learned during
+
+
+    search, r(l) is incremented for each literal l E c. Every 255 decisions, the scores are updated:
+    for each literal, l, s(l) becomes r(l) + s(l)/2, and r(l) becomes zero.
+ */
