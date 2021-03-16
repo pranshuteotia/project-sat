@@ -1,13 +1,14 @@
 //
 // Created by prans on 3/15/2021.
 //
+#ifndef PROJECT_SAT_HEURISTIC_H
+#define PROJECT_SAT_HEURISTIC_H
+
 #include <vector>
 #include <unordered_set>
 #include <algorithm>
+#include "../lib/DPLLSolver.h"
 
-
-#ifndef PROJECT_SAT_HEURISTIC_H
-#define PROJECT_SAT_HEURISTIC_H
 
 class Heuristic {
 private:

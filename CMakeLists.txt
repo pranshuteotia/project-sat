@@ -1,6 +1,10 @@
 cmake_minimum_required(VERSION 3.16)
 project(project_sat)
-
 set(CMAKE_CXX_STANDARD 14)
 
-add_executable(project-sat src/main.cpp lib/BruteForceSolver.cpp lib/BruteForceSolver.h lib/DPLLSolver.cpp lib/DPLLSolver.h obj/Clause.h src/main.cpp obj/Heuristic.cpp obj/Heuristic.h obj/DLIS.h)
+add_library(heuristic-obj OBJECT obj/Heuristic.cpp)
+add_library(dpll-solver-obj OBJECT lib/DPLLSolver.cpp)
+add_library(brute-force-obj OBJECT lib/BruteForceSolver.cpp)
+add_library(main-obj OBJECT src/main.cpp)
+add_executable(project-sat)
+target_link_libraries(project-sat main-obj heuristic-obj dpll-solver-obj brute-force-obj)

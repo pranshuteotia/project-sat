@@ -6,7 +6,7 @@
 #ifndef PROJECT_SAT_DLIS_H
 #define PROJECT_SAT_DLIS_H
 
-class DLIS: public Heuristic{
+class DLIS : public Heuristic {
 
 };
 

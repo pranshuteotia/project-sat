@@ -12,7 +12,7 @@ DPLLSolver::DPLLSolver(const std::vector<std::vector<int>>& clauses, size_t num_
     this->_deleted_literals = nullptr;
     this->_literals.emplace_back(-2, 0);
     for(size_t i=1; i<=num_variables; ++i) this->_literals.emplace_back(0, i);
-    h.init();
+//    h.init();
 
     size_t clause_id = 0;
     for(const std::vector<int>& clause : clauses) {
