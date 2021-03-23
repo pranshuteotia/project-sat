@@ -7,19 +7,19 @@
 #include <vector>
 #include <unordered_set>
 #include <algorithm>
+#include "Clause.h"
 
 class Heuristic {
 private:
-    std::vector<size_t> _literal_frequency;
-
+    std::vector<int> _literal_frequency;
     size_t literal_to_index(int literal) const;
 
 public:
     Heuristic() = default;
 
-    void init();
+    void init(const size_t &num_variables, const std::vector<Clause> &clauses);
 
-    int pick_literal();
+    int pick_literal(const size_t &num_variables, const std::vector<Clause> &clauses);
 };
 
 

@@ -8,6 +8,9 @@
 
 class DLIS : public Heuristic {
 
+public:
+    DLIS() = default;
+
 };
 
 #endif //PROJECT_SAT_DLIS_H

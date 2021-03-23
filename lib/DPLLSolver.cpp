@@ -12,7 +12,6 @@ DPLLSolver::DPLLSolver(const std::vector<std::vector<int>>& clauses, size_t num_
     this->_deleted_literals = nullptr;
     this->_literals.emplace_back(-2, 0);
     for(size_t i=1; i<=num_variables; ++i) this->_literals.emplace_back(0, i);
-//    h.init();
 
     size_t clause_id = 0;
     for(const std::vector<int>& clause : clauses) {
@@ -59,7 +58,7 @@ int DPLLSolver::solve() {
         }
     }
 
-    int literal = this->pick_literal();
+    int literal = h.pick_literal(this->_num_variables, this->_clause_objects);
     if(literal == 0) {
         return 0;
     }

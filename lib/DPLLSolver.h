@@ -9,7 +9,7 @@
 #include <queue>
 #include <algorithm>
 #include "../obj/Clause.h"
-#include "../obj/Heuristic.h"
+#include "../obj/DLIS.h"
 
 
 class DPLLSolver {
@@ -65,7 +65,7 @@ private:
     void apply_literal_copy_constructor(DPLLSolver& f, const int& literal);
 
     // Heuristics
-//    DLIS h;
+    DLIS h;
 
 public:
     DPLLSolver(const std::vector<std::vector<int>>& clauses, size_t num_variables);
