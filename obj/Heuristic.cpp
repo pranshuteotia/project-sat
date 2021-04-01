@@ -5,7 +5,7 @@
 #include "Heuristic.h"
 
 //void Heuristic::init(const size_t &num_variables, const std::vector<Clause> &clauses) {
-void Heuristic::init(std::vector<std::unordered_set<size_t>> &_watch_list) {
+void Heuristic::init(std::vector<std::unordered_set<size_t>> *_watch_list) {
     /*this->_literal_frequency = std::vector<int>((num_variables*2)+1, 0);
     this->_literal_frequency[0] = -1;
 

@@ -11,7 +11,7 @@ class DLIS : public Heuristic {
 
 public:
 
-    DLIS();
+//    DLIS();
 
     /*int pick_literal(const size_t &num_variables, const std::vector<Clause> &clauses) {
         this->init(num_variables, clauses);
@@ -29,7 +29,7 @@ public:
     }*/
 
     int pick_literal() {
-        std::cout << *this->_literal_frequency[0].begin() << std::endl;
+        std::cout << *(this->_literal_frequency->operator[](0).begin()) << std::endl;
         return 0;
     }
 };

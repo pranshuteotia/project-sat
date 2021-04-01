@@ -28,7 +28,7 @@ DPLLSolver::DPLLSolver(const std::vector<std::vector<int>>& clauses, size_t num_
     this->_pq_start = _pq.begin();
     this->_pq_end = _pq.end();
     std::make_heap(this->_pq_start,this->_pq_end,_size_comp);
-    h.init(this->_watch_list);
+    h.init(&(this->_watch_list));
 }
 
 void DPLLSolver::unit_propagation() {
