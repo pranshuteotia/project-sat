@@ -5,6 +5,8 @@
 #include "../lib/DPLLSolver.h"
 #include <chrono>
 #include <fstream>
+#include <cstring>
+#include <set>
 
 std::pair<std::vector<std::vector<int>>, int> parse_file(std::string filename) {
     std::vector<std::vector<int>> clauses;
@@ -71,32 +73,46 @@ std::string print_assignments(std::vector<bool> v) {
     return assignments;
 }
 
-int main() {
-    auto result = parse_file("data.in");
-    auto clauses = result.first;
-    int num_variables = result.second;
+int main(int argc, char* argv[]) {
+    if (argc != 4) {
+        std::cout << "usage:\n" ;
+        std::cout << "\tproject-sat heuristic mode /path/to/cnf-file" << std::endl;
+        return 1;
+    }
+    std::string heursitic_string{argv[1]};
+    std::string mode_string{argv[2]};
+    std::string filename_string{argv[3]};
 
-    /*for(const auto &clause : clauses) {
-        for(auto literal : clause) {
-            std::cout << literal << ' ';
+    // corresponds to using DLIS vs VSIDS heuristic object
+    std::set<std::string> heuristics {"dlis","vsids"};
+    // corresponds to solve_no_stack, solve_copy_constructor, solve
+    std::set<std::string> modes {"no-stack","copy-constructor","undo-stack"};
+
+    if (heuristics.count(heursitic_string) == 0) {
+        std::cout << "usage:\n" ;
+        std::cout << "\tproject-sat heuristic mode /path/to/cnf-file\n";
+        std::cout << "heuristic must be one of the following:";
+        for (auto h : heuristics) {
+            std::cout << '\n' << '\t' << h;
         }
-
         std::cout << std::endl;
-    }*/
-
-    /*BruteForceSolver solver(clauses, num_variables);
-    auto all_instances = solver.iter_solve();
-
-    auto sat = solver.solve();
-    for(const auto &sat : all_instances) {
-        for(auto v : sat) {
-            std::cout << v << " ";
-        }
-        std::cout << std::endl;
+        return 1;
     }
 
-    solver.output_to_file();*/
+    if (modes.count(mode_string) == 0) {
+        std::cout << "usage:\n" ;
+        std::cout << "\tproject-sat heuristic mode /path/to/cnf-file\n";
+        std::cout << "mode must be one of the following:";
+        for (auto m : modes) {
+            std::cout << '\n' << '\t' << m;
+        }
+        std::cout << std::endl;
+        return 1;
+    }
 
+    auto result = parse_file(filename_string);
+    auto clauses = result.first;
+    int num_variables = result.second;
 
     auto start = std::chrono::steady_clock::now();
     DPLLSolver solver2(clauses, num_variables);
@@ -113,7 +129,7 @@ int main() {
     start = std::chrono::steady_clock::now();
     DPLLSolver solver1(clauses, num_variables);
     if(solver1.solve_no_stack()) {
-        std::cout << print_assignments(solver2.get_assignments()) << std::endl << std::endl;
+        std::cout << print_assignments(solver1.get_assignments()) << std::endl << std::endl;
 
     } else {
         std::cout << "Unsatisfiable\n";
@@ -125,7 +141,7 @@ int main() {
     start = std::chrono::steady_clock::now();
     DPLLSolver solver3(clauses, num_variables);
     if(solver3.solve_copy_constructor()) {
-        std::cout << print_assignments(solver2.get_assignments()) << std::endl << std::endl;
+        std::cout << print_assignments(solver3.get_assignments()) << std::endl << std::endl;
 
     } else {
         std::cout << "Unsatisfiable\n";
