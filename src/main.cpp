@@ -118,7 +118,7 @@ int main(int argc, char* argv[]) {
     DLIS h;
 
     auto start = std::chrono::steady_clock::now();
-    DPLLSolver solver2(clauses, num_variables, h);
+    DPLLSolver solver2(clauses, num_variables);
     if(solver2.solve()) {
         std::cout << print_assignments(solver2.get_assignments()) << std::endl << std::endl;
 
