@@ -25,12 +25,16 @@ public:
         }
     }
 
-    int pick_literal() {
+    int pick_literal() override {
         ++(this->_decisions);
         auto highest_score = std::max_element(this->_score.begin(), this->_score.end());
         int literal = highest_score - this->_score.begin();
 
+        return 0;
+    }
 
+    int pick_literal(const std::vector<std::unordered_set<size_t>> &literal_frequency) override {
+        return 0;
     }
 };
 #endif //PROJECT_SAT_VSIDS_H

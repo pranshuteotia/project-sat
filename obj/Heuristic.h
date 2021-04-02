@@ -16,7 +16,11 @@ protected:
     size_t literal_to_index(int literal) const;
 
 public:
-    virtual void init(std::vector<std::unordered_set<size_t>> *_watch_list);
+    ~Heuristic() {}
+
+    virtual void init(std::vector<std::unordered_set<size_t>> *_watch_list) = 0;
+    virtual int pick_literal() = 0;
+    virtual int pick_literal(const std::vector<std::unordered_set<size_t>> &literal_frequency) = 0;
 };
 
 

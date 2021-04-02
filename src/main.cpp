@@ -79,6 +79,7 @@ int main(int argc, char* argv[]) {
         std::cout << "\tproject-sat heuristic mode /path/to/cnf-file" << std::endl;
         return 1;
     }
+
     std::string heursitic_string{argv[1]};
     std::string mode_string{argv[2]};
     std::string filename_string{argv[3]};
@@ -118,7 +119,7 @@ int main(int argc, char* argv[]) {
     DLIS h;
 
     auto start = std::chrono::steady_clock::now();
-    DPLLSolver solver2(clauses, num_variables);
+    DPLLSolver solver2(clauses, num_variables, h);
     if(solver2.solve()) {
         std::cout << print_assignments(solver2.get_assignments()) << std::endl << std::endl;
 
@@ -130,7 +131,7 @@ int main(int argc, char* argv[]) {
     std::cout << time.count()/1000 << std::endl;
 
     start = std::chrono::steady_clock::now();
-    DPLLSolver solver1(clauses, num_variables);
+    DPLLSolver solver1(clauses, num_variables, h);
     if(solver1.solve_no_stack()) {
         std::cout << print_assignments(solver1.get_assignments()) << std::endl << std::endl;
 
@@ -142,7 +143,7 @@ int main(int argc, char* argv[]) {
     std::cout << time.count()/1000 << std::endl;
 
     start = std::chrono::steady_clock::now();
-    DPLLSolver solver3(clauses, num_variables);
+    DPLLSolver solver3(clauses, num_variables, h);
     if(solver3.solve_copy_constructor()) {
         std::cout << print_assignments(solver3.get_assignments()) << std::endl << std::endl;
 

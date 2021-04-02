@@ -9,8 +9,11 @@
 class DLIS : public Heuristic {
 
 public:
+    void init(std::vector<std::unordered_set<size_t>> *_watch_list) {
+        this->_literal_frequency = _watch_list;
+    }
 
-    int pick_literal() {
+    int pick_literal() override {
         int literal = -1;
         size_t freq = 0;
         for(size_t i=0; i<this->_literal_frequency->size(); ++i) {
@@ -24,7 +27,7 @@ public:
         return (literal & 1)? -literal/2 : literal/2;
     }
 
-    int pick_literal(const std::vector<std::unordered_set<size_t>> &literal_frequency) {
+    int pick_literal(const std::vector<std::unordered_set<size_t>> &literal_frequency) override {
         int literal = -1;
         size_t freq = 0;
         for(size_t i=0; i<literal_frequency.size(); ++i) {
