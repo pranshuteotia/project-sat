@@ -5,32 +5,37 @@
 #define PROJECT_SAT_DLIS_H
 
 #include "Heuristic.h"
-#include <iostream>
 
 class DLIS : public Heuristic {
 
 public:
 
-//    DLIS();
-
-    /*int pick_literal(const size_t &num_variables, const std::vector<Clause> &clauses) {
-        this->init(num_variables, clauses);
-
-        auto e = std::max_element(this->_literal_frequency.begin(), this->_literal_frequency.end());
-        int idx = e - this->_literal_frequency.begin();
-        int literal = idx/2;
-
-        if (idx & 1) {
-            return -literal;
-
-        } else {
-            return literal;
-        }
-    }*/
-
     int pick_literal() {
-        std::cout << *(this->_literal_frequency->operator[](0).begin()) << std::endl;
-        return 0;
+        int literal = -1;
+        size_t freq = 0;
+        for(size_t i=0; i<this->_literal_frequency->size(); ++i) {
+            size_t clause_size = (*(this->_literal_frequency))[i].size();
+            if (clause_size > freq) {
+                freq = clause_size;
+                literal = i;
+            }
+        }
+
+        return (literal & 1)? -literal/2 : literal/2;
+    }
+
+    int pick_literal(const std::vector<std::unordered_set<size_t>> &literal_frequency) {
+        int literal = -1;
+        size_t freq = 0;
+        for(size_t i=0; i<literal_frequency.size(); ++i) {
+            size_t clause_size = literal_frequency[i].size();
+            if (clause_size > freq) {
+                freq = clause_size;
+                literal = i;
+            }
+        }
+
+        return (literal & 1)? -literal/2 : literal/2;
     }
 };
 
