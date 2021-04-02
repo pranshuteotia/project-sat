@@ -16,7 +16,7 @@ protected:
     size_t literal_to_index(int literal) const;
 
 public:
-    void init(std::vector<std::unordered_set<size_t>> *_watch_list);
+    virtual void init(std::vector<std::unordered_set<size_t>> *_watch_list);
 };
 
 
