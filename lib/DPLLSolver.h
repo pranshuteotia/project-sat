@@ -65,7 +65,7 @@ private:
     void apply_literal_copy_constructor(DPLLSolver& f, const int& literal);
 
     // Heuristics
-    DLIS h;
+    DLIS _h;
 
 public:
     DPLLSolver(const std::vector<std::vector<int>>& clauses, size_t num_variables);

@@ -28,7 +28,7 @@ DPLLSolver::DPLLSolver(const std::vector<std::vector<int>>& clauses, size_t num_
     this->_pq_start = _pq.begin();
     this->_pq_end = _pq.end();
     std::make_heap(this->_pq_start,this->_pq_end,_size_comp);
-    h.init(&(this->_watch_list));
+    _h.init(&(this->_watch_list));
 }
 
 void DPLLSolver::unit_propagation() {
@@ -60,7 +60,7 @@ int DPLLSolver::solve() {
     }
 
 //    int literal = h.pick_literal(this->_num_variables, this->_clause_objects);
-    int literal = h.pick_literal();
+    int literal = _h.pick_literal();
     if(literal == 0) {
         return 0;
     }
@@ -186,7 +186,7 @@ int DPLLSolver::solve_no_stack() {
         }
     }
 
-    int literal = this->pick_literal();
+    int literal = _h.pick_literal();
     if(literal == 0) {
         return 0;
     }
@@ -315,7 +315,7 @@ int DPLLSolver::DPLL(DPLLSolver &f) {
 
     DPLLSolver new_f = f;
 
-    int literal = new_f.pick_literal();
+    int literal = new_f._h.pick_literal(new_f._watch_list);
     if(literal == 0) {
         return 0;
     }

@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.16)
 project(project_sat)
 set(CMAKE_CXX_STANDARD 14)
 
-add_library(heuristic-obj OBJECT obj/Heuristic.cpp)
+add_library(heuristic-obj OBJECT obj/Heuristic.cpp obj/VSIDS.h)
 add_library(dpll-solver-obj OBJECT lib/DPLLSolver.cpp)
 add_library(brute-force-obj OBJECT lib/BruteForceSolver.cpp)
 add_library(main-obj OBJECT src/main.cpp)

@@ -11,15 +11,12 @@
 
 class Heuristic {
 protected:
-//    std::vector<int> _literal_frequency;
+
     std::vector<std::unordered_set<size_t>> *_literal_frequency;
     size_t literal_to_index(int literal) const;
 
 public:
-//    Heuristic() = default;
-
-//    void init(const size_t &num_variables, const std::vector<Clause> &clauses);
-    void init(std::vector<std::unordered_set<size_t>> *_watch_list);
+    virtual void init(std::vector<std::unordered_set<size_t>> *_watch_list);
 };
 
 
