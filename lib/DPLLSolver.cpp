@@ -81,6 +81,7 @@ int DPLLSolver::solve() {
     if(result == 0) {
         // Undo all changes.
         this->undo_state();
+        this->_h->undo_score(literal);
 
         this->_assignments[std::abs(literal)] = !this->_assignments[std::abs(literal)];
 
@@ -98,6 +99,7 @@ int DPLLSolver::solve() {
         }
 
         this->undo_state();
+        this->_h->undo_score(-literal);
     }
 
     return result;
@@ -137,6 +139,7 @@ void DPLLSolver::undo_state() {
 
     for(auto pair : s) {
         int literal = pair.first;
+//        _h->decrease_occurrence_count(literal);
         int clause_id = pair.second;
         this->_watch_list[literal_to_index(literal)].insert(clause_id);
         this->_literals[std::abs(-literal)].first++;
@@ -144,7 +147,7 @@ void DPLLSolver::undo_state() {
         if(current_clause != clause_id) {
             current_clause = clause_id;
             this->_clause_objects[clause_id].undoLastModification();
-            --this->_clauses_removed;
+            --(this->_clauses_removed);
         }
     }
     this->_modifications.pop();
@@ -157,6 +160,7 @@ void DPLLSolver::apply_literal(const int &literal) {
         ++this->_clauses_removed;
 
         for(int l : this->_clause_objects[id]._literals) {
+            _h->increase_occurrence_count(l);
             this->_deleted_clauses->emplace_back(l, id);
             this->_literals[std::abs(l)].first--;
             this->_watch_list[literal_to_index(l)].erase(id);
@@ -280,6 +284,7 @@ DPLLSolver::DPLLSolver(DPLLSolver const &o, const SizeComp sizeComp) : _size_com
     this->_pq_start = o._pq_start;
     this->_pq_end = o._pq_end;
     this->_watch_list = o._watch_list;
+    this->_h = o._h;
 }
 
 void DPLLSolver::unit_propagation_copy_constructor(DPLLSolver &f) {

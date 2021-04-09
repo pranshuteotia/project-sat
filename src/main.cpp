@@ -3,6 +3,7 @@
 #include <sstream>
 #include "../lib/BruteForceSolver.h"
 #include "../lib/DPLLSolver.h"
+#include "../obj/VSIDS.h"
 #include <chrono>
 #include <fstream>
 #include <cstring>
@@ -116,7 +117,7 @@ int main(int argc, char* argv[]) {
     int num_variables = result.second;
 
     // Initialize heuristics.
-    DLIS h;
+     VSIDS h;
 
     auto start = std::chrono::steady_clock::now();
     DPLLSolver solver2(clauses, num_variables, h);
@@ -143,7 +144,7 @@ int main(int argc, char* argv[]) {
     std::cout << time.count()/1000 << std::endl;
 
     start = std::chrono::steady_clock::now();
-    DPLLSolver solver3(clauses, num_variables, h);
+    /*DPLLSolver solver3(clauses, num_variables, h);
     if(solver3.solve_copy_constructor()) {
         std::cout << print_assignments(solver3.get_assignments()) << std::endl << std::endl;
 
@@ -152,7 +153,7 @@ int main(int argc, char* argv[]) {
     }
     end = std::chrono::steady_clock::now();
     time = end-start;
-    std::cout << time.count()/1000 << std::endl;
+    std::cout << time.count()/1000 << std::endl;*/
 
 //    auto end = std::chrono::steady_clock::now();
 //    std::chrono::duration<double, std::milli> time = end-start;

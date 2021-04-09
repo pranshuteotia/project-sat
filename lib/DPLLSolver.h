@@ -9,7 +9,7 @@
 #include <queue>
 #include <algorithm>
 #include "../obj/Clause.h"
-#include "../obj/DLIS.h"
+#include "../obj/Heuristic.h"
 
 
 class DPLLSolver {
@@ -25,7 +25,7 @@ private:
         }
     };
 
-    size_t literal_to_index(int literal) const {
+    static size_t literal_to_index(int literal) {
         if (literal > 0) { return (literal << 1); }
         else { return ((-literal) << 1) + 1; }
     }
