@@ -4,6 +4,7 @@
 #include "../lib/BruteForceSolver.h"
 #include "../lib/DPLLSolver.h"
 #include "../obj/VSIDS.h"
+#include "../obj/DLIS.h"
 #include <chrono>
 #include <fstream>
 #include <cstring>
@@ -112,52 +113,69 @@ int main(int argc, char* argv[]) {
         return 1;
     }
 
+    // Load CNF file.
     auto result = parse_file(filename_string);
     auto clauses = result.first;
     int num_variables = result.second;
 
-    // Initialize heuristics.
-     VSIDS h;
-
+    // Initialize timing variables.
     auto start = std::chrono::steady_clock::now();
-    DPLLSolver solver2(clauses, num_variables, h);
-    if(solver2.solve()) {
-        std::cout << print_assignments(solver2.get_assignments()) << std::endl << std::endl;
-
-    } else {
-        std::cout << "Unsatisfiable" << std::endl;
-    }
     auto end = std::chrono::steady_clock::now();
+
+    // Initialize heuristics.
+    Heuristic* heuristic;
+    VSIDS vsids_heuristic;
+    DLIS dlis_heursitic;
+
+    if (heursitic_string == "dlis") {
+        heuristic = &dlis_heursitic;
+    }
+    else {
+        heuristic = &vsids_heuristic;
+    }
+
+    bool solver_result = false;
+    start = std::chrono::steady_clock::now();
+    // Undo stack
+    DPLLSolver solver(clauses, num_variables, *heuristic);
+    if (mode_string == "undo-stack") {
+        solver_result = solver.solve();
+    }
+    else if (mode_string == "no-stack") {
+        solver_result = solver.solve_no_stack();
+    }
+    else {
+        solver_result = solver.solve_copy_constructor();
+    }
+    end = std::chrono::steady_clock::now();
     std::chrono::duration<double, std::milli> time = end-start;
-    std::cout << time.count()/1000 << std::endl;
+    std::cout << int(solver_result) << std::endl;
+    std::cerr << time.count()/1000 << std::endl;
 
-    start = std::chrono::steady_clock::now();
-    DPLLSolver solver1(clauses, num_variables, h);
-    if(solver1.solve_no_stack()) {
-        std::cout << print_assignments(solver1.get_assignments()) << std::endl << std::endl;
-
-    } else {
-        std::cout << "Unsatisfiable\n";
-    }
-    end = std::chrono::steady_clock::now();
-    time = end-start;
-    std::cout << time.count()/1000 << std::endl;
-
-    start = std::chrono::steady_clock::now();
-    /*DPLLSolver solver3(clauses, num_variables, h);
-    if(solver3.solve_copy_constructor()) {
-        std::cout << print_assignments(solver3.get_assignments()) << std::endl << std::endl;
-
-    } else {
-        std::cout << "Unsatisfiable\n";
-    }
-    end = std::chrono::steady_clock::now();
-    time = end-start;
-    std::cout << time.count()/1000 << std::endl;*/
-
-//    auto end = std::chrono::steady_clock::now();
-//    std::chrono::duration<double, std::milli> time = end-start;
+//    // No stack
+//    start = std::chrono::steady_clock::now();
+//    DPLLSolver solver1(clauses, num_variables, *heuristic);
+//    if(solver1.solve_no_stack()) {
+//        std::cout << print_assignments(solver1.get_assignments()) << std::endl << std::endl;
+//    } else {
+//        std::cout << "Unsatisfiable\n";
+//    }
+//    end = std::chrono::steady_clock::now();
+//    time = end-start;
 //    std::cout << time.count()/1000 << std::endl;
-    
+//
+//    start = std::chrono::steady_clock::now();
+//    // Copy constructor
+//    DPLLSolver solver3(clauses, num_variables, *heuristic);
+//    if(solver3.solve_copy_constructor()) {
+//        std::cout << print_assignments(solver3.get_assignments()) << std::endl << std::endl;
+//
+//    } else {
+//        std::cout << "Unsatisfiable\n";
+//    }
+//    end = std::chrono::steady_clock::now();
+//    time = end-start;
+//    std::cout << time.count()/1000 << std::endl;
+
     return 0;
 }
