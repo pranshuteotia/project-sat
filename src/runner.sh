@@ -1,11 +1,62 @@
 #!/usr/bin/env bash
 
-while getopts u:a:f: flag
-do
-    case "${flag}" in
-        b) BENCHMARK_DIR=${OPTARG};;
-        s) SOLVER=${OPTARG};;
-    esac
-done
+BENCHMARK_DIR=$1
+SOLVER=$2
+OUTPUT=$3
+HEURISTICS=("dlis" "vsids")
+MODES=("no-stack" "copy-constructor" "undo-stack")
 
-BENCHMARKS=$BENCHMARK_DIR/*.tar.gz
+echo "BENCHMARK DIR: $BENCHMARK_DIR"
+if [ "$BENCHMARK_DIR" == "" ]; then
+  echo "No benchmark directory given."
+  echo "usage:"
+  echo "    runner.sh /path/to/benchmark_dir /path/to/solver /path/to/output/data_file"
+  exit 1
+fi
+
+echo "SOLVER: $SOLVER"
+if [ "$SOLVER" == "" ]; then
+  echo "No solver given."
+  echo "usage:"
+  echo "    runner.sh /path/to/benchmark_dir /path/to/solver /path/to/output/data_file"
+  exit 1
+fi
+
+echo "OUTPUT: $OUTPUT"
+if [ "$OUTPUT" == "" ]; then
+  echo "No output file given."
+  echo "usage:"
+  echo "    runner.sh /path/to/benchmark_dir /path/to/solver /path/to/output/data_file"
+  exit 1
+fi
+
+WORKING_DIR=`pwd`
+mkdir -p $WORKING_DIR/tmp
+TMP_DIR="$WORKING_DIR/tmp"
+# Reset output files.
+for heuristic in $HEURISTICS; do
+  for mode in $MODES; do
+    rm -f $OUTPUT/$heuristic-$mode.csv
+    touch $OUTPUT/$heuristic-$mode.csv
+  done
+done
+for BENCHMARK_ARCHIVE in $BENCHMARK_DIR/*.tar.gz; do
+  # Clear tmp directory.
+  rm -rf $TMP_DIR
+  mkdir -p $TMP_DIR
+  # Extract benchmarks into tmp directory.
+  tar -xzf $BENCHMARK_ARCHIVE -C $TMP_DIR
+  # Run solver over all benchmarks and settings in directory.
+  file_list=$(find $TMP_DIR -iname '*.cnf' -type f)
+  for benchmark_file in "$file_list"; do
+    for heuristic in $HEURISTICS; do
+      for mode in $MODES; do
+        $SOLVER "$heuristic" "$mode" "$benchmark_file" 1>$TMP_DIR/tmp_sat_result.txt 2>$TMP_DIR/tmp_time_result.txt
+        benchmark_name="$(basename $benchmark_file)"
+        runtime="$(cat $TMP_DIR/tmp_time_result.txt)"
+        satisfiable="$(cat $TMP_DIR/tmp_sat_result.txt)"
+        echo "$benchmark_name,$runtime,$satisfiable" >> $OUTPUT/$heuristic-$mode.csv
+      done
+    done
+  done
+done
