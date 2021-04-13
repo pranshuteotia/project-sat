@@ -33,6 +33,7 @@ public:
 
     void increase_occurrence_count(const int &literal) override {}
     void decrease_occurrence_count(const int &literal) override {}
+    void undo_score(const int &literal) override {}
 };
 
 #endif //PROJECT_SAT_DLIS_H
