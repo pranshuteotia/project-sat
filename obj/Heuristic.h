@@ -14,13 +14,15 @@ protected:
 
     std::vector<std::unordered_set<size_t>> *_literal_frequency;
     size_t literal_to_index(int literal) const;
+    int index_to_literal(size_t index) const;
 
 public:
-    ~Heuristic() {}
-
     virtual void init(std::vector<std::unordered_set<size_t>> *_watch_list) = 0;
     virtual int pick_literal() = 0;
     virtual int pick_literal(const std::vector<std::unordered_set<size_t>> &literal_frequency) = 0;
+    virtual void increase_occurrence_count(const int &literal) = 0;
+    virtual void decrease_occurrence_count(const int &literal) = 0;
+    virtual void undo_score(const int &literal) = 0;
 };
 
 
