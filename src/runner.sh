@@ -48,10 +48,14 @@ for BENCHMARK_ARCHIVE in $BENCHMARK_DIR/*.tar.gz; do
   tar -xzf $BENCHMARK_ARCHIVE -C $TMP_DIR
   # Run solver over all benchmarks and settings in directory.
   file_list=$(find $TMP_DIR -iname '*.cnf' -type f)
-  for benchmark_file in "$file_list"; do
+  for benchmark_file in $file_list; do
+    sed -i -r 's/(\s+)/ /g' $benchmark_file
     for heuristic in $HEURISTICS; do
       for mode in $MODES; do
-        $SOLVER "$heuristic" "$mode" "$benchmark_file" 1>$TMP_DIR/tmp_sat_result.txt 2>$TMP_DIR/tmp_time_result.txt
+        echo "$SOLVER \"$heuristic\" \"$mode\" \"$benchmark_file\" 1>$TMP_DIR/tmp_sat_result.txt 2>$TMP_DIR/tmp_time_result.txt"
+        $SOLVER "$heuristic" "$mode" "$benchmark_file" >$TMP_DIR/tmp_sat_result.txt 2>$TMP_DIR/tmp_time_result.txt
+        #echo "$benchmark_file"
+        #echo "--"
         benchmark_name="$(basename $benchmark_file)"
         runtime="$(cat $TMP_DIR/tmp_time_result.txt)"
         satisfiable="$(cat $TMP_DIR/tmp_sat_result.txt)"
