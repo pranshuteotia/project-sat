@@ -18,7 +18,10 @@ private:
     public:
         const DPLLSolver& _solver;
 
+        SizeComp() = delete;
         SizeComp(const DPLLSolver& solver) : _solver(solver) { }
+        SizeComp(const SizeComp& that) : _solver(that._solver) { }
+        SizeComp(SizeComp&& that) : _solver(that._solver) { }
 
         bool operator()(const size_t& lhs, const size_t& rhs) const {
             return _solver._clause_objects[lhs]._literals.size() > _solver._clause_objects[rhs]._literals.size();
