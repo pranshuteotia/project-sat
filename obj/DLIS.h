@@ -31,9 +31,9 @@ public:
         return (literal & 1)? -literal/2 : literal/2;
     }
 
-    void increase_occurrence_count(const int &literal) override {}
-    void decrease_occurrence_count(const int &literal) override {}
-    void undo_score(const int &literal) override {}
+    void increase_occurrence_count(const int &) override {}
+    void decrease_occurrence_count(const int &) override {}
+    void undo_score(const int &) override {}
 };
 
 #endif //PROJECT_SAT_DLIS_H

@@ -53,7 +53,7 @@ public:
         return literal;
     }
 
-    int pick_literal(const std::vector<std::unordered_set<size_t>> &literal_frequency) override {
+    int pick_literal(const std::vector<std::unordered_set<size_t>> &) override {
         return this->pick_literal();
     }
 
