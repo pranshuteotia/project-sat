@@ -44,15 +44,17 @@ public:
         ++(this->_decisions);
 
         auto max_score = std::max_element(this->_score.begin(), this->_score.end());
-        int literal = max_score - this->_score.begin();
+        int idx = max_score - this->_score.begin();
 
+        int literal = (idx & 1) ? -(idx/2) : idx/2;
+        this->_score[this->literal_to_index(-literal)] = -(this->_score[this->literal_to_index(-literal)]);
         *max_score = -(*max_score);
 
-        return (literal & 2) ? -(literal/2) : literal/2;
+        return literal;
     }
 
     int pick_literal(const std::vector<std::unordered_set<size_t>> &literal_frequency) override {
-        return 0;
+        return this->pick_literal();
     }
 
     void increase_occurrence_count(const int &literal) override {
@@ -65,7 +67,10 @@ public:
 
     void undo_score(const int &literal) override {
         size_t idx = this->literal_to_index(literal);
+        size_t idx2 = this->literal_to_index(-literal);
+
         this->_score[idx] = std::abs(this->_score[idx]);
+        this->_score[idx2] = std::abs(this->_score[idx2]);
     }
 };
 #endif //PROJECT_SAT_VSIDS_H

@@ -81,7 +81,6 @@ int DPLLSolver::solve() {
     if(result == 0) {
         // Undo all changes.
         this->undo_state();
-        this->_h->undo_score(literal);
 
         this->_assignments[std::abs(literal)] = !this->_assignments[std::abs(literal)];
 
@@ -99,9 +98,8 @@ int DPLLSolver::solve() {
         }
 
         this->undo_state();
-        this->_h->undo_score(-literal);
     }
-
+    this->_h->undo_score(literal);
     return result;
 }
 
@@ -230,7 +228,7 @@ int DPLLSolver::solve_no_stack() {
         this->_clauses_removed = clauses_removed_copy;
         this->_literals = literals_copy;
     }
-
+    _h->undo_score(literal);
     return result;
 }
 
@@ -257,6 +255,7 @@ void DPLLSolver::apply_literal_no_stack(const int &literal) {
         ++this->_clauses_removed;
 
         for(int l : this->_clause_objects[id]._literals) {
+            _h->increase_occurrence_count(l);
             this->_literals[std::abs(l)].first--;
             this->_watch_list[literal_to_index(l)].erase(id);
         }
@@ -347,7 +346,7 @@ int DPLLSolver::DPLL(DPLLSolver &f) {
             return 1;
         }
     }
-
+    _h->undo_score(literal);
     return result;
 }
 
@@ -358,6 +357,7 @@ void DPLLSolver::apply_literal_copy_constructor(DPLLSolver &f, const int &litera
         ++f._clauses_removed;
 
         for(int l : f._clause_objects[id]._literals) {
+            _h->increase_occurrence_count(l);
             f._literals[std::abs(l)].first--;
             f._watch_list[literal_to_index(l)].erase(id);
         }
