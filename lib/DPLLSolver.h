@@ -47,7 +47,7 @@ private:
 
     int pick_literal();
 
-    int _clauses_removed;
+    size_t _clauses_removed;
     std::vector<std::pair<int, int>>* _deleted_clauses;
     std::vector<std::pair<int, int>>* _deleted_literals;
 
