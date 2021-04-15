@@ -4,7 +4,7 @@
 
 #include "DPLLSolver.h"
 
-DPLLSolver::DPLLSolver(const std::vector<std::vector<int>>& clauses, size_t num_variables, Heuristic &h) : _clause_objects(std::vector<Clause>(clauses.size(), Clause())), _watch_list(std::vector<std::unordered_set<size_t>>((num_variables << 1) + 2)), _pq(std::vector<size_t>(clauses.size())), _size_comp(SizeComp(*this)) {
+DPLLSolver::DPLLSolver(const std::vector<std::vector<int>>& clauses, size_t num_variables, Heuristic *h) : _clause_objects(std::vector<Clause>(clauses.size(), Clause())), _watch_list(std::vector<std::unordered_set<size_t>>((num_variables << 1) + 2)), _pq(std::vector<size_t>(clauses.size())), _size_comp(SizeComp(*this)) {
     this->_num_variables = num_variables;
     this->_assignments = std::vector<bool>(this->_num_variables+1, false);
     this->_clauses_removed = 0;
@@ -28,7 +28,7 @@ DPLLSolver::DPLLSolver(const std::vector<std::vector<int>>& clauses, size_t num_
     this->_pq_start = _pq.begin();
     this->_pq_end = _pq.end();
     std::make_heap(this->_pq_start,this->_pq_end,_size_comp);
-    _h = &h;
+    _h = h;
     _h->init(&(this->_watch_list));
 }
 

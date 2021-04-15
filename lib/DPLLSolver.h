@@ -71,7 +71,7 @@ private:
     Heuristic *_h;
 
 public:
-    DPLLSolver(const std::vector<std::vector<int>>& clauses, size_t num_variables, Heuristic &h);
+    DPLLSolver(const std::vector<std::vector<int>>& clauses, size_t num_variables, Heuristic *h);
 
     DPLLSolver(const DPLLSolver& o, SizeComp sizeComp);
 

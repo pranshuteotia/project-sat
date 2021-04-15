@@ -137,7 +137,7 @@ int main(int argc, char* argv[]) {
     bool solver_result = false;
     start = std::chrono::steady_clock::now();
     // Undo stack
-    DPLLSolver solver(clauses, num_variables, *heuristic);
+    DPLLSolver solver(clauses, num_variables, heuristic);
     if (mode_string == "undo-stack") {
         solver_result = solver.solve();
     }

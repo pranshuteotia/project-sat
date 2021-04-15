@@ -8,7 +8,7 @@
 
 class DLIS : public Heuristic {
 private:
-    struct FrequencyComparator {
+    static const struct FrequencyComparator {
         bool operator()(const std::unordered_set<size_t> &o1, const std::unordered_set<size_t> &o2) const {
             return o1.size() < o2.size();
         }
